@@ -1,0 +1,13 @@
+---
+# vars file for oracle.oracle_home
+packages :                  nano,mc,oracle-database-server-12cR2-preinstall,xorg-x11-server-Xorg,xorg-x11-xauth,xorg-x11-apps
+oracle_password:      "0ra6oo"
+oracle_inventory:       /u01/app/oraInventory
+oracle_user:               oracle
+oracle_install_group:  oinstall 
+oracle_base :              /u01/app/oracle
+###
+oracle_home:            "{{oracle_base+'/product/'+oracle_version+'/'+oracle_dbhome}}"  
+database_install_dir:  "{{oracle_distr+'/database'}}"
+ora_inventory_file:      "{{oracle_inventory+'/ContentsXML/inventory.xml'}}"   
+ora_archive_file_url:       "https://cloud.dcteam.ru/s/lnYGE0m7dmxvbXj/download"

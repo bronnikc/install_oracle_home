@@ -1,0 +1,126 @@
+---
+   - name: Check existing oracle_home
+     stat: path={{ora_inventory_file}}
+     register: inv
+     tags:
+      - check_oracle_home
+   - lineinfile:
+      path: "{{ora_inventory_file}}"
+      regexp: '^<HOME NAME.*{{oracle_home}}' 
+      state: absent
+     check_mode: yes
+     register: home_exists
+     when: inv.stat.exists
+     tags:
+      - check_oracle_home
+   - fail:
+       msg: "ORACLE_HOME={{ oracle_home }} already exists!!! Please change ORACLE_HOME"
+     when:  home_exists.changed  and home_exists is not skipped
+     tags:
+       - check_oracle_home     
+   - name: install preinstall package
+     yum: name={{packages}} state=present
+     tags: mount_share
+   - name: disable firewall
+     service: name=firewalld state=stopped enabled=false
+   - name: create directories
+     file: 
+         path: "{{ item }}"
+         state: directory
+         mode: 0775
+         owner: "{{oracle_user}}"
+         group: "{{oracle_install_group}}"
+     with_items:
+       - "{{ oracle_base }}"
+       - "{{ oracle_home }}"
+       - "{{ oracle_inventory }}"
+       - "{{ oracle_distr }}"
+   - name: gen oracle password
+     user: 
+        name: oracle 
+        password: "{{ oracle_password  | password_hash('sha512') }}" 
+   - name: Unpack Oracle  Database Software
+     unarchive:  
+      src:  "{{ora_archive_file_url}}"   
+      dest: "{{ oracle_distr }}"
+      remote_src: yes 
+      owner: "{{oracle_user}}"
+      group: "{{oracle_install_group}}"
+     become: true  
+     become_user: "{{oracle_user}}"
+     tags:
+       - unzip
+   - name: Setup Oracle Database Software silent response file
+     become: true
+     become_user: "{{ oracle_user }}"
+     template: src=install-{{ oracle_version }}.rsp.j2 dest={{ oracle_distr }}/install-{{ oracle_version }}.rsp mode=660
+     tags:
+       - db_setuprspfile
+
+   - name: Install  Database Software
+     become: true
+     become_user: "{{ oracle_user }}"
+     shell: 
+        cmd: "{{ database_install_dir }}/runInstaller -silent -showProgress -responseFile {{ oracle_distr }}/install-{{ oracle_version }}.rsp  -ignorePrereqFailure  -waitForCompletion"
+     register: install_log
+     ignore_errors: yes
+     tags:
+      - db_setup
+      - setup_all
+   - debug: var=install_log
+     tags:
+      - db_setup
+      - setup_all
+   - fail:
+       msg: "Error in runInstaller - {{install_log}}"
+     when:  install_log.failed==true
+     tags:
+       - db_setup
+   - name: Execute orainstroot.sh
+     shell:
+       cmd: "{{ oracle_inventory }}/orainstRoot.sh" 
+     register: roots
+     tags:
+         - exeorainventory 
+         - setup_all
+   - debug: var=roots
+     tags:
+      - exeorainventory
+      - setup_all      
+   - fail:
+       msg: "Error in orainstRoot.sh - {{roots}}"
+     when:  roots.failed==true
+     tags:
+       - setup_all
+       - exeorainventory 
+   - name: Execute root.sh
+     shell:
+       cmd: "{{ oracle_home}}/root.sh --silent"
+     register: root_sh
+     tags:
+         - exerootsh
+         - setup_all
+   - debug: var=root_sh
+     tags:
+      - exerootsh
+      - setup_all      
+   - fail:
+       msg: "Error in root.sh - {{root_sh}}"
+     when:  root_sh.failed==true
+     tags:
+       - setup_all
+       - exerootsh    
+   - name: copy bash_profile
+     become: true
+     become_user: "{{ oracle_user }}"
+     template: src=bash_profile.j2  dest=/home/{{oracle_user}}/.bash_profile  mode=0544
+     tags:
+     - setup_all   
+   - name: Remove stage directory  
+     file : path={{ oracle_distr }}  state=absent
+     tags:
+       - remove_stage_files
+       - setup_all
+    
+    
+    

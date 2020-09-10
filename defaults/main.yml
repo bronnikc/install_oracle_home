@@ -1,0 +1,6 @@
+---
+# defaults file for oracle.oracle_home
+#install variables 
+oracle_version:          "12.2"
+oracle_distr:               /u01/stage
+oracle_dbhome:         dbhome_1
