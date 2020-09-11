@@ -4,3 +4,4 @@
 oracle_version:          "12.2"
 oracle_distr:               /u01/stage
 oracle_dbhome:         dbhome_1
+oracle_password:      "0ra6oo"
