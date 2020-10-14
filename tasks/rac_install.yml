@@ -1,0 +1,100 @@
+- name: create stage directory {{ oracle_distr }}
+  file: 
+    path: "{{ oracle_distr }}"
+    state: directory
+    mode: 0775
+    owner: "{{ oracledb.user }}"
+    group: "{{ oracledb.group }}"
+  become: true  
+  become_user: "{{ oracledb.user }}"
+- name:  create directories
+  file: 
+    path: "{{ _oracle_nodes[0] }}"
+    state: directory
+    mode: 0775
+    owner: "{{ oracledb.user }}"
+    group: "{{ oracledb.group }}"
+  delegate_to: "{{ _oracle_nodes[1].ip_addr }}"  
+  with_nested:
+       - ["{{ oracledb.oracle_base }}", "{{ oracledb.oracle_home }}"]
+       - "{{ nodes }}"
+  loop_control:
+       loop_var: _oracle_nodes
+       label: '[create directory {{ _oracle_nodes[0] }} on node  {{ _oracle_nodes[1].name }}]' 
+  become: true    
+- name: Unpack Oracle  Database Software to dir {{ database_install_dir }}
+  unarchive:  
+       src:  "{{ ora_archive_file_url }}"   
+       dest: "{{ oracle_distr }}"
+       remote_src: yes 
+       owner: "{{ oracledb.user }}"
+       group: "{{ oracledb.group }}"
+  become: true  
+  become_user: "{{ oracledb.user }}"
+  tags:
+     - unzip
+- name: Setup Oracle Database Software silent response file
+  template: src=install-{{ oracle_version }}.rsp.j2 dest={{ oracle_distr }}/install-{{ oracle_version }}.rsp mode=660
+  become: true
+  become_user: "{{ oracledb.user }}"
+  tags: configure_oracle_home
+
+- name: Install  Database Software
+  shell: 
+    cmd: "{{ database_install_dir }}/runInstaller -silent -ignorePrereqFailure -responseFile {{ oracle_distr }}/install-{{ oracle_version }}.rsp  -skipPrereqs  -waitForCompletion"
+  become: true
+  become_user: "{{ oracledb.user }}"
+  register: _install_log
+  ignore_errors: yes
+  tags: configure_oracle_home
+- include_tasks: display_stdout_or_error.yml
+  vars:
+    _install_stdout: "{{ _install_log }}"
+  when: _install_log.rc |default(0,true) !=0 or _install_log.stderr|default('',true) != '' or display_output
+  tags: configure_oracle_home
+
+- name: Run Root.sh on master_node {{inventory_hostname}}
+  shell:
+    cmd: "{{ oracledb.oracle_home }}/root.sh > {{ oracle_distr }}/rootsh.log"
+  become: true 
+  register: _rootsh_stdout  
+  tags: configure_oracle_home
+- include_tasks: display_stdout_or_error.yml
+  vars:
+    _install_stdout: "{{ _rootsh_stdout }}"
+  when: _rootsh_stdout.rc |default(0,true) !=0 or _rootsh_stdout.stderr|default('',true) != '' or display_output
+  tags: configure_oracle_home
+
+- name: Run Root.sh on others nodes
+  shell:
+    cmd: "{{ oracledb.oracle_home }}/root.sh > {{ oracle_distr }}/rootsh.log"
+  become: true 
+  register: _rootsh_stdout_nodes  
+  delegate_to: "{{ _oracle_nodes.ip_addr }}"
+  with_items:
+    -  "{{ nodes }}"
+  loop_control:
+    loop_var: _oracle_nodes
+    label: '[run {{ oracledb.oracle_home }}/root.sh on node {{ _oracle_nodes.name }}]'
+  when: _oracle_nodes.name != inventory_hostname
+  tags: configure_oracle_home
+- include_tasks: display_stdout_or_error.yml
+  vars:
+    _install_stdout: "{{ _node_stdout }}"
+  with_items:
+     - "{{ _rootsh_stdout_nodes.results|default([],true) }}"
+  loop_control:
+    loop_var: _node_stdout  
+    label: '[run {{ oracledb.oracle_home }}/root.sh on node {{ _node_stdout._oracle_nodes.name }}]'
+  when: _node_stdout.rc |default(0,true) !=0 or _node_stdout.stderr|default('',true) != '' or display_output
+  tags: configure_oracle_home
+
+
+# - include_tasks: display_stdout_or_error.yml
+#   vars:
+#     _install_stdout: _rootsh_stdout
+#   with_items:
+     
+#   when: _rootsh_stdout.rc |default(0,true) !=0 or _rootsh_stdout.stderr|default('',true) != '' or display_output
+#   tags: configure_oracle_home
+

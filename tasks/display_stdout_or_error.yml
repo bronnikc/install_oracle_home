@@ -1,0 +1,14 @@
+---
+- name: display output
+  debug: 
+    var: _install_stdout
+- name: display error
+  debug: 
+    var: _install_stdout.stderr_lines
+  when:  _install_stdout.stderr|default('',true) !='' or _install_stdout.rc|default(0,true) != 0
+- name: asserts that errors found
+  assert:
+   that: 
+    - "_install_stdout.stderr|default('',true) == ''"
+    - "_install_stdout.rc|default(0,true) == 0"
+   fail_msg: "Command failed" 
