@@ -5,3 +5,4 @@ oracle_version:          "12.2"
 oracle_distr:               /u01/stage
 oracle_dbhome:         dbhome_1
 oracle_password:      "0ra6oo"
+ora_archive_file_url: "https://cloud.dcteam.ru/s/lnYGE0m7dmxvbXj/download"

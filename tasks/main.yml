@@ -61,7 +61,7 @@
      become: true
      become_user: "{{ oracle_user }}"
      shell: 
-        cmd: "{{ database_install_dir }}/runInstaller -silent -showProgress -responseFile {{ oracle_distr }}/install-{{ oracle_version }}.rsp  -ignorePrereqFailure  -waitForCompletion"
+        cmd: "{{ database_install_dir }}/runInstaller -silent -showProgress -responseFile {{ oracle_distr }}/install-{{ oracle_version }}.rsp  -ignoreSysPrereqs  -waitForCompletion"
      register: install_log
      ignore_errors: yes
      tags:
@@ -70,12 +70,12 @@
    - debug: var=install_log
      tags:
       - db_setup
-      - setup_all
-   - fail:
-       msg: "Error in runInstaller - {{install_log}}"
-     when:  install_log.failed==true
-     tags:
-       - db_setup
+      - setup_all   
+  #  - fail:
+  #      msg: "Error in runInstaller - {{install_log}}"
+  #    when:   nstall_log.failed==true
+  #    tags:
+  #      - db_setup
    - name: Execute orainstroot.sh
      shell:
        cmd: "{{ oracle_inventory }}/orainstRoot.sh" 

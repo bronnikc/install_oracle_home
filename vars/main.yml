@@ -9,4 +9,4 @@ oracle_base :              /u01/app/oracle
 oracle_home:            "{{oracle_base+'/product/'+oracle_version+'/'+oracle_dbhome}}"  
 database_install_dir:  "{{oracle_distr+'/database'}}"
 ora_inventory_file:      "{{oracle_inventory+'/ContentsXML/inventory.xml'}}"   
-ora_archive_file_url:       "https://cloud.dcteam.ru/s/lnYGE0m7dmxvbXj/download"
+#ora_archive_file_url:       "https://cloud.dcteam.ru/s/lnYGE0m7dmxvbXj/download"
