@@ -1,22 +1,16 @@
 ---
 # vars file for oracle.oracle_home
-packages :                  nano,mc,oracle-database-server-12cR2-preinstall,xorg-x11-server-Xorg,xorg-x11-xauth
-oracle_inventory:       /u01/app/oraInventory
-oracle_base: /u01/app/oracle
-oracle_user: oracle
-oracle_install_group:  oinstall 
-database_install_dir:  "{{oracle_distr+'/database'}}"
-
-###
-oracle_home:            "{{oracle_base+'/product/'+oracle_version+'/'+oracle_dbhome}}"  
-#database_install_dir:  "{{oracle_distr+'/database'}}"
-ora_inventory_file:      "{{oracle_inventory+'/ContentsXML/inventory.xml'}}"   
-#ora_archive_file_url:       "https://cloud.dcteam.ru/s/lnYGE0m7dmxvbXj/download"
+packages: nano,mc,oracle-database-server-12cR2-preinstall,xorg-x11-server-Xorg,xorg-x11-xauth
+_oracle_inventory: /u01/app/oraInventory
+_oracle_base: /u01/app/oracle
+_oracle_user: oracle
+_oracle_install_group: oinstall 
+database_install_dir: "{{oracle_distr+'/database'}}"
 
 oracledb:
-  user: "{{ oracle_user }}"
-  group: "{{ oracle_install_group }}"
-  oracle_base: '{{ oracle_base }}'
-  oracle_inventory: /u01/app/oraInventory
-  oracle_home: "{{oracle_base+'/product/'+oracle_version+'/'+oracle_dbhome}}"  
-  ora_inventory_file:     "{{oracle_inventory+'/ContentsXML/inventory.xml'}}"   
+  user: "{{ _oracle_user }}"
+  group: "{{ _oracle_install_group }}"
+  oracle_base: "{{ _oracle_base }}"
+  oracle_inventory: "{{ _oracle_inventory }}"
+  oracle_home: "{{_oracle_base+'/product/'+oracle_version+'/'+oracle_dbhome}}"  
+  ora_inventory_file: "{{_oracle_inventory+'/ContentsXML/inventory.xml'}}"   

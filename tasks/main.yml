@@ -1,26 +1,28 @@
 ---
-   - debug: msg="Start install Oracle Database software for {{ type_install }} type installation"
-  #  - block:  
-  #     - name: Check existing oracle_home
-  #       stat: 
-  #         path: "{ oracledb.ora_inventory_file }}"
-  #       register: inv     
-  #     - lineinfile:
-  #         path: "{ oracledb.ora_inventory_file }}"
-  #         regexp: "^<HOME NAME.*{{ oracledb.oracle_home }}"
-  #         state: absent
-  #       check_mode: yes
-  #       register: home_exists
-  #       when: inv.stat.exists
-  #     - fail:
-  #         msg: "ORACLE_HOME={{ oracledb.oracle_home }} already exists!!! Please change ORACLE_HOME"
-  #       when:  home_exists.changed  and home_exists is not skipped
-  #    become: true
-  #    become_user: "{{ oracledb.user }}"
-  #    tags:
-  #      - check_oracle_home         
+   - debug: msg="Start install Oracle Database software for {{ type_install }} type installation into home {{ oracledb.oracle_home }}"
+   - block:  
+      - name: Check existing oracle_home
+        stat: 
+          path: "{ oracledb.ora_inventory_file }}"
+        register: inv     
+      - lineinfile:
+          path: "{ oracledb.ora_inventory_file }}"
+          regexp: "^<HOME NAME.*{{ oracledb.oracle_home }}"
+          state: absent
+        check_mode: yes
+        register: home_exists
+        when: inv.stat.exists
+      - fail:
+          msg: "ORACLE_HOME={{ oracledb.oracle_home }} already exists!!! Please change ORACLE_HOME"
+        when:  home_exists.changed  and home_exists is not skipped
+     become: true
+     #become_user: "{{ oracledb.user }}"
+     tags:
+       - check_oracle_home         
    - include_tasks: rac_install.yml
-     when: type_install == 'db_rac'    
+     when: type_install == 'db_rac'   
+   - include_tasks: single_install.yml
+     when: type_install == 'db_single'     
    
 #           template: src=install-{{ oracle_version }}.rsp.j2 dest={{ oracle_distr }}/install-{{ oracle_version }}.rsp mode=660
   #  - block:
