@@ -1,5 +1,6 @@
 ---
 - block:
+    - debug: var=inv
     - name: install preinstall package
       yum: name={{packages}} state=present
     - name: disable firewall
