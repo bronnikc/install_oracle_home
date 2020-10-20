@@ -23,7 +23,7 @@
      when: type_install == 'db_rac'   
    - include_tasks: single_install.yml
      vars:
-      _oraInv: inv.stat.exists|bool  
+      _oraInv: "{{ inv.stat.exists|bool }}"
      when: type_install == 'db_single'     
   always:       
    - name: Clean stage directory
