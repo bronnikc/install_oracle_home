@@ -1,6 +1,5 @@
 ---
 - block:
-    - debug: var=_oraInv
     - name: install preinstall package
       yum: name={{packages}} state=present
     - name: disable firewall

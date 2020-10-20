@@ -2,13 +2,10 @@
 - block:
    - debug: msg="Start install Oracle Database software for {{ type_install }} type installation into home {{ oracledb.oracle_home }}"
    - block:  
-      - debug: 
-          msg: "{{ oracledb.ora_inventory_file }}"
       - name: Check existing oracle_home
         stat: 
           path: "{{ oracledb.ora_inventory_file }}"
         register: inv
-      - debug: var=inv      
       - lineinfile:
           path: "{ oracledb.ora_inventory_file }}"
           regexp: "^<HOME NAME.*{{ oracledb.oracle_home }}"
