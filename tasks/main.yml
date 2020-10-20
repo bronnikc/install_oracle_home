@@ -5,7 +5,8 @@
       - name: Check existing oracle_home
         stat: 
           path: "{ oracledb.ora_inventory_file }}"
-        register: inv     
+        register: inv    
+      - set_fact: oraInv= {{ inv.stat.exists }}
       - lineinfile:
           path: "{ oracledb.ora_inventory_file }}"
           regexp: "^<HOME NAME.*{{ oracledb.oracle_home }}"
@@ -23,7 +24,7 @@
      when: type_install == 'db_rac'   
    - include_tasks: single_install.yml
      vars:
-      _oraInv: "{{ inv.stat.exists|bool }}"
+      _oraInv: "{{ oraInv }}"
      when: type_install == 'db_single'     
   always:       
    - name: Clean stage directory
