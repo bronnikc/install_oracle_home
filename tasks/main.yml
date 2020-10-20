@@ -6,7 +6,7 @@
           msg: "{{ oracledb.ora_inventory_file }}"
       - name: Check existing oracle_home
         stat: 
-          path: "{ oracledb.ora_inventory_file }}"
+          path: "{{ oracledb.ora_inventory_file }}"
         register: inv
       - debug: var=inv      
       - lineinfile:
