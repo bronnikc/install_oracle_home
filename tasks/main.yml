@@ -1,4 +1,5 @@
 ---
+- block:
    - debug: msg="Start install Oracle Database software for {{ type_install }} type installation into home {{ oracledb.oracle_home }}"
    - block:  
       - name: Check existing oracle_home
@@ -22,3 +23,9 @@
      when: type_install == 'db_rac'   
    - include_tasks: single_install.yml
      when: type_install == 'db_single'     
+  always:       
+   - name: Clean stage directory
+     file:
+      path: "{{ oracle_distr }}" 
+      state: absent
+     become: true 
