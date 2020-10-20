@@ -8,9 +8,8 @@ oracle_version:         '12.2'
 oracle_distr:          '/u01/app/stage'
 #oracle_dbhome:         'dbhome_1'
 oracle_password:      '0ra6oo'
-ora_archive_file_url: "/vagrant_software/database.zip"
-#"https://cloud.dcteam.ru/s/lnYGE0m7dmxvbXj/download"
-type_install: 'db_rac' #db_single' 'db_raconenode' 
+ora_archive_file_url: "https://cloud.dcteam.ru/s/lnYGE0m7dmxvbXj/download"
+type_install: 'db_single' #db_single' 'db_raconenode' 
 nodes:
   - {name: 'node1',vip_name: 'node1-vip', ip_addr: '192.168.10.212'}
   - {name: 'node2',vip_name: 'node2-vip',ip_addr: '192.168.10.213'}
