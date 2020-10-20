@@ -10,7 +10,7 @@
         name: "{{ oracledb.user }}" 
         password: "{{ oracle_password  | password_hash('sha512') }}"
   become: true     
-  when: not inv.stat.exists
+  when: not _oraInv|default(false,true)
 - name:  create directories
   file: 
     path: "{{ item }}"
