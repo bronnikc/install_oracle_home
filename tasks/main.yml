@@ -5,7 +5,8 @@
       - name: Check existing oracle_home
         stat: 
           path: "{ oracledb.ora_inventory_file }}"
-        register: inv    
+        register: inv
+      - debug: var=inv      
       - lineinfile:
           path: "{ oracledb.ora_inventory_file }}"
           regexp: "^<HOME NAME.*{{ oracledb.oracle_home }}"
