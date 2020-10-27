@@ -14,7 +14,6 @@
        loop_var: _oracle_nodes
        label: '[created directory {{ _oracle_nodes[0] }} on node  {{ _oracle_nodes[1].name }}]' 
   become: true    
-  become_user: "{{ oracledb.user }}"
 - name: Unpack Oracle  Database Software to dir {{ database_install_dir }}
   unarchive:  
        src:  "{{ ora_archive_file_url }}"   
