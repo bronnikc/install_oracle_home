@@ -11,10 +11,6 @@ oracle.install.db.OSBACKUPDBA_GROUP=backupdba
 oracle.install.db.OSDGDBA_GROUP=dgdba
 oracle.install.db.OSKMDBA_GROUP=kmdba
 oracle.install.db.OSRACDBA_GROUP=racdba
-{% if  type_install == 'db_rac' -%}
-oracle.install.db.CLUSTER_NODES={% for param in nodes %}{{param.name}},{% endfor %}
-
-{% endif %}
 SECURITY_UPDATES_VIA_MYORACLESUPPORT=false
 DECLINE_SECURITY_UPDATES=true
 ##oracle.installer.autoupdates.option=SKIP_UPDATES
