@@ -25,9 +25,9 @@
      vars:
       _oraInv: "{{ inv.stat.exists|bool }}"
      when: type_install == 'db_single'     
-  always:       
-   - name: Clean stage directory
-     file:
-      path: "{{ oracle_distr }}" 
-      state: absent
-     become: true 
+  # always:       
+  #  - name: Clean stage directory
+  #    file:
+  #     path: "{{ oracle_distr }}" 
+  #     state: absent
+  #    become: true 
